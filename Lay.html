@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7e9df" />
+  <title>Uma cartinha para você ❤️</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Montserrat:wght@400;500;600&display=swap');
+
+    :root {
+      --rose: #b83b5e;
+      --rose-dark: #7f1736;
+      --blush: #f4c7c3;
+      --paper: #fffaf0;
+      --cream: #f8eadf;
+      --gold: #e6a72f;
+      --green: #356b48;
+      --ink: #4b3035;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 15%, rgba(255,255,255,.92) 0 2%, transparent 17%),
+        radial-gradient(circle at 82% 8%, rgba(255,255,255,.58) 0 3%, transparent 19%),
+        linear-gradient(145deg, #fff7f1 0%, #f8e2da 48%, #efd0cc 100%);
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .22;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+      z-index: 20;
+    }
+
+    .intro {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at center, rgba(255,250,244,.97), rgba(243,203,199,.98)),
+        linear-gradient(135deg, #fff9f5, #eabcb7);
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .intro.opened {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .intro-content {
+      text-align: center;
+      animation: introFloat 3.5s ease-in-out infinite;
+    }
+
+    .intro-hint {
+      margin: 0 0 20px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      font-size: .72rem;
+      font-weight: 600;
+      color: rgba(92,45,57,.72);
+    }
+
+    .envelope-button {
+      position: relative;
+      width: min(330px, 82vw);
+      height: min(220px, 55vw);
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      filter: drop-shadow(0 25px 26px rgba(103,43,56,.24));
+      transform-style: preserve-3d;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .envelope-button:focus-visible {
+      outline: 3px solid rgba(184,59,94,.45);
+      outline-offset: 14px;
+      border-radius: 16px;
+    }
+
+    .envelope-back,
+    .envelope-front,
+    .envelope-flap {
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+    }
+
+    .envelope-back {
+      background: linear-gradient(145deg, #ca667f, #a82e50);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
+    }
+
+    .envelope-front {
+      overflow: hidden;
+      z-index: 3;
+    }
+
+    .envelope-front::before,
+    .envelope-front::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      width: 72%;
+      height: 100%;
+      background: linear-gradient(145deg, #c95673, #9e2647);
+    }
+
+    .envelope-front::before {
+      left: 0;
+      clip-path: polygon(0 0, 100% 100%, 0 100%);
+    }
+
+    .envelope-front::after {
+      right: 0;
+      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+      background: linear-gradient(215deg, #d36d85, #a92f51);
+    }
+
+    .envelope-flap {
+      z-index: 4;
+      transform-origin: top;
+      transition: transform 1s cubic-bezier(.2,.75,.25,1);
+      clip-path: polygon(0 0, 100% 0, 50% 64%);
+      background: linear-gradient(160deg, #df7890, #b63d5d 70%);
+      box-shadow: inset 0 1px rgba(255,255,255,.3);
+    }
+
+    .seal {
+      position: absolute;
+      z-index: 6;
+      top: 51%;
+      left: 50%;
+      width: 70px;
+      height: 70px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #ffe8ec;
+      background:
+        radial-gradient(circle at 34% 28%, #e16a83 0 5%, transparent 6%),
+        radial-gradient(circle, #a91f46, #74132f);
+      box-shadow: 0 8px 16px rgba(69,15,31,.3), inset 0 0 0 4px rgba(255,255,255,.09);
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 1.55rem;
+      transition: transform .45s ease, opacity .45s ease;
+    }
+
+    .envelope-button:hover .seal { transform: translate(-50%, -50%) scale(1.08) rotate(-4deg); }
+
+    .open-label {
+      position: absolute;
+      top: calc(100% + 23px);
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--rose-dark);
+      font-family: 'Caveat', cursive;
+      font-size: 1.55rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .open-label::after {
+      content: "";
+      display: block;
+      height: 2px;
+      margin: 2px auto 0;
+      width: 0;
+      background: var(--rose);
+      transition: width .4s ease;
+    }
+
+    .envelope-button:hover .open-label::after { width: 100%; }
+
+    .envelope-button.is-opening .envelope-flap { transform: rotateX(180deg); }
+    .envelope-button.is-opening .seal { transform: translate(-50%, -50%) scale(.4); opacity: 0; }
+
+    .scene {
+      width: min(920px, 100%);
+      opacity: 0;
+      transform: translateY(35px) scale(.98);
+      transition: opacity 1s ease .45s, transform 1s ease .45s;
+      position: relative;
+      z-index: 4;
+    }
+
+    body.revealed .scene {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .eyebrow {
+      text-align: center;
+      font-size: .72rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: rgba(88,48,57,.65);
+      margin-bottom: 18px;
+    }
+
+    .letter-wrap {
+      position: relative;
+      padding: 26px clamp(10px, 4vw, 45px) 44px;
+    }
+
+    .letter {
+      position: relative;
+      z-index: 3;
+      width: min(690px, 100%);
+      margin: auto;
+      padding: clamp(32px, 6vw, 62px) clamp(25px, 7vw, 72px) 46px;
+      background:
+        linear-gradient(rgba(255,251,239,.94), rgba(255,249,233,.96)),
+        repeating-linear-gradient(0deg, transparent 0 31px, rgba(108,72,79,.08) 32px);
+      border-radius: 3px 9px 4px 8px;
+      box-shadow:
+        0 32px 70px rgba(89,52,57,.21),
+        0 3px 8px rgba(89,52,57,.08),
+        inset 0 0 80px rgba(205,154,108,.08);
+      transform: rotate(-.35deg);
+    }
+
+    .letter::before,
+    .letter::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .letter::before {
+      inset: 13px;
+      border: 1px solid rgba(152,101,94,.15);
+    }
+
+    .letter::after {
+      width: 70px;
+      height: 28px;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%) rotate(1.5deg);
+      background: rgba(225,199,160,.48);
+      box-shadow: 0 1px 2px rgba(82,53,45,.08);
+    }
+
+    .letter h1 {
+      margin: 0 0 26px;
+      font-family: 'Caveat', cursive;
+      font-size: clamp(2.4rem, 7vw, 4rem);
+      line-height: 1;
+      color: var(--rose-dark);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .letter p {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1.35rem, 3.4vw, 1.72rem);
+      line-height: 1.48;
+      color: #51353b;
+      margin: 0 0 18px;
+    }
+
+    .letter .signature {
+      margin: 31px 0 0;
+      text-align: right;
+      color: var(--rose-dark);
+      font-size: clamp(1.55rem, 4vw, 2rem);
+    }
+
+    .little-heart {
+      display: inline-block;
+      color: var(--rose);
+      animation: heartbeat 1.8s infinite;
+    }
+
+    .bouquet {
+      position: absolute;
+      z-index: 5;
+      bottom: 4px;
+      width: 220px;
+      height: 345px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .8s ease 1s;
+    }
+
+    body.revealed .bouquet { opacity: 1; }
+    .bouquet.left { left: -17px; transform: rotate(-8deg); }
+    .bouquet.right { right: -17px; transform: scaleX(-1) rotate(-8deg); }
+
+    .stem {
+      position: absolute;
+      width: 8px;
+      height: 270px;
+      left: 104px;
+      bottom: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #214d32, #4b8559, #285738);
+      transform-origin: bottom;
+      animation: growStem 1.3s cubic-bezier(.16,.8,.3,1) both;
+    }
+
+    .stem.s2 { left: 73px; height: 230px; transform: rotate(-17deg); animation-delay: .22s; }
+    .stem.s3 { left: 133px; height: 245px; transform: rotate(17deg); animation-delay: .35s; }
+    .stem.s4 { left: 48px; height: 190px; transform: rotate(-29deg); animation-delay: .45s; }
+
+    .leaf {
+      position: absolute;
+      width: 52px;
+      height: 26px;
+      background: linear-gradient(145deg, #60966b, #2f6743);
+      border-radius: 100% 0 100% 0;
+      transform-origin: right center;
+      opacity: 0;
+      animation: leafIn .55s ease forwards;
+    }
+
+    .leaf.l1 { left: 54px; bottom: 99px; transform: rotate(24deg); animation-delay: 1.15s; }
+    .leaf.l2 { left: 105px; bottom: 148px; transform: scaleX(-1) rotate(20deg); animation-delay: 1.3s; }
+    .leaf.l3 { left: 27px; bottom: 59px; transform: rotate(16deg); animation-delay: 1.5s; }
+
+    .flower {
+      position: absolute;
+      width: 105px;
+      height: 105px;
+      opacity: 0;
+      transform: scale(.15) rotate(-15deg);
+      animation: bloom 1s cubic-bezier(.18,.89,.23,1.3) forwards;
+    }
+
+    .sunflower { left: 52px; top: 5px; animation-delay: 1.12s; }
+    .rose.r1 { left: 5px; top: 92px; animation-delay: 1.35s; }
+    .rose.r2 { left: 112px; top: 83px; transform: scale(.15) rotate(12deg); animation-delay: 1.55s; }
+
+    .sunflower .petal {
+      position: absolute;
+      left: 39px;
+      top: 2px;
+      width: 27px;
+      height: 53px;
+      border-radius: 70% 70% 55% 55%;
+      transform-origin: 50% 50px;
+      background: linear-gradient(to bottom, #ffd95c, #e9a617);
+      box-shadow: inset 0 -4px 8px rgba(167,94,9,.13);
+    }
+
+    .sunflower .petal:nth-child(1) { transform: rotate(0deg); }
+    .sunflower .petal:nth-child(2) { transform: rotate(45deg); }
+    .sunflower .petal:nth-child(3) { transform: rotate(90deg); }
+    .sunflower .petal:nth-child(4) { transform: rotate(135deg); }
+    .sunflower .petal:nth-child(5) { transform: rotate(180deg); }
+    .sunflower .petal:nth-child(6) { transform: rotate(225deg); }
+    .sunflower .petal:nth-child(7) { transform: rotate(270deg); }
+    .sunflower .petal:nth-child(8) { transform: rotate(315deg); }
+
+    .sunflower .center {
+      position: absolute;
+      z-index: 2;
+      width: 48px;
+      height: 48px;
+      top: 29px;
+      left: 29px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 32% 30%, #7b4c1f 0 4%, transparent 5%),
+        radial-gradient(circle at 65% 65%, #5d3615 0 4%, transparent 5%),
+        radial-gradient(circle, #72421b, #39200e);
+      box-shadow: inset 0 0 0 7px rgba(73,37,8,.15), 0 3px 8px rgba(72,40,10,.2);
+    }
+
+    .rose {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 54% 52%, #7e1435 0 7%, transparent 8%),
+        radial-gradient(ellipse at 43% 49%, transparent 0 12%, #bd3b5c 13% 25%, transparent 26%),
+        radial-gradient(ellipse at 57% 45%, transparent 0 22%, #d95876 23% 36%, transparent 37%),
+        radial-gradient(circle, #ed7891 0 49%, #9f2748 50% 67%, transparent 68%);
+      filter: drop-shadow(0 5px 7px rgba(95,21,43,.2));
+    }
+
+    .petal-rain {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .falling-petal {
+      position: absolute;
+      top: -50px;
+      width: 18px;
+      height: 27px;
+      border-radius: 75% 15% 70% 30%;
+      background: linear-gradient(145deg, #f193a6, #bc3e60);
+      opacity: .76;
+      animation: fall linear forwards;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-family: 'Caveat', cursive;
+      font-size: 1.18rem;
+      color: rgba(87,52,59,.7);
+      margin-top: 2px;
+    }
+
+    .replay {
+      display: block;
+      margin: 18px auto 0;
+      border: 0;
+      background: transparent;
+      color: var(--rose-dark);
+      font: 600 .73rem 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      cursor: pointer;
+      padding: 10px;
+      opacity: .72;
+    }
+
+    .replay:hover { opacity: 1; }
+
+    @keyframes introFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.22); }
+      27% { transform: scale(1); }
+      42% { transform: scale(1.16); }
+      55% { transform: scale(1); }
+    }
+
+    @keyframes growStem {
+      from { scale: 1 0; }
+      to { scale: 1 1; }
+    }
+
+    @keyframes leafIn {
+      from { opacity: 0; scale: .2; }
+      to { opacity: 1; scale: 1; }
+    }
+
+    @keyframes bloom {
+      0% { opacity: 0; transform: scale(.15) rotate(-20deg); }
+      70% { opacity: 1; transform: scale(1.08) rotate(4deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+
+    @keyframes fall {
+      0% { transform: translate3d(0,-30px,0) rotate(0deg); opacity: 0; }
+      8% { opacity: .8; }
+      100% { transform: translate3d(var(--drift),110vh,0) rotate(var(--spin)); opacity: .25; }
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 20px 7px 28px; }
+      .letter-wrap { padding-inline: 5px; padding-bottom: 100px; }
+      .letter { transform: none; }
+      .bouquet { width: 150px; height: 250px; bottom: -4px; scale: .72; }
+      .bouquet.left { left: -32px; transform: rotate(-8deg); transform-origin: bottom left; }
+      .bouquet.right { right: -32px; transform: scaleX(-1) rotate(-8deg); transform-origin: bottom right; }
+      .letter p { line-height: 1.42; }
+    }
+
+    @media (max-width: 480px) {
+      .eyebrow { font-size: .62rem; }
+      .letter { padding-inline: 28px; }
+      .bouquet { scale: .62; bottom: -20px; }
+      .footer-note { margin-top: -15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="intro" id="intro">
+    <div class="intro-content">
+      <p class="intro-hint">Para uma pessoa mais que especial, para minha futura mulher (senhorita dentes)</p>
+      <button class="envelope-button" id="openButton" aria-label="Abrir a cartinha">
+        <span class="envelope-back"></span>
+        <span class="envelope-flap"></span>
+        <span class="envelope-front"></span>
+        <span class="seal">Abre</span>
+        <span class="open-label">clique para abrir ❤️</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="petal-rain" id="petalRain" aria-hidden="true"></div>
+
+  <main class="scene" id="scene">
+    <div class="eyebrow">Uma pequena lembrança de um sentimento enorme</div>
+
+    <section class="letter-wrap">
+      <div class="bouquet left" aria-hidden="true">
+        <div class="stem"></div><div class="stem s2"></div><div class="stem s3"></div><div class="stem s4"></div>
+        <div class="leaf l1"></div><div class="leaf l2"></div><div class="leaf l3"></div>
+        <div class="flower sunflower">
+          <span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span>
+          <span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span>
+          <span class="center"></span>
+        </div>
+        <div class="flower rose r1"></div>
+        <div class="flower rose r2"></div>
+      </div>
+
+      <article class="letter">
+        <!-- PERSONALIZE O NOME ABAIXO -->
+        <h1>Para você <span class="little-heart">♥</span></h1>
+
+        <p>Estou te dando esse presente pois me lembra muito você kkkkkk S2.</p>
+
+        <p>Quero que ele seja uma lembrança, todos os dias, de que eu estou aqui.</p>
+
+        <p>Nem sempre é fácil encontrar as palavras certas para explicar tudo o que eu sinto, mas existe uma verdade que é simples, EU AMO VOCÊ.</p>
+
+        <p>Amo o seu jeito, a sua presença e a forma como você consegue deixar meus dias melhores apenas sendo quem você é (Falando mais que tudo).</p>
+
+        <p>Quando olhar para este presente, espero que se lembre de mim e tenha a certeza de que existe alguém que pensa em você.</p>
+
+        <p>É só um presente (bem simples), eu sei. Mas o sentimento que existe por trás dele é muito maior do que qualquer coisa que eu poderia colocar dentro dessa pequena capivara.</p>
+
+        <!-- TROQUE "SEU NOME" PELO SEU NOME -->
+        <p class="signature">Com todo o meu amor,<br><strong>Tiago Almagro de Oliveira</strong> <span class="little-heart">♥</span></p>
+      </article>
+
+      <div class="bouquet right" aria-hidden="true">
+        <div class="stem"></div><div class="stem s2"></div><div class="stem s3"></div><div class="stem s4"></div>
+        <div class="leaf l1"></div><div class="leaf l2"></div><div class="leaf l3"></div>
+        <div class="flower sunflower">
+          <span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span>
+          <span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span>
+          <span class="center"></span>
+        </div>
+        <div class="flower rose r1"></div>
+        <div class="flower rose r2"></div>
+      </div>
+    </section>
+
+    <p class="footer-note">Feito com carinho, só para você.</p>
+    <button class="replay" id="replayButton">ver novamente</button>
+  </main>
+
+  <script>
+    const intro = document.getElementById('intro');
+    const openButton = document.getElementById('openButton');
+    const replayButton = document.getElementById('replayButton');
+    const petalRain = document.getElementById('petalRain');
+    let opened = false;
+
+    function createPetals() {
+      petalRain.innerHTML = '';
+      const amount = window.innerWidth < 600 ? 28 : 48;
+
+      for (let i = 0; i < amount; i++) {
+        const petal = document.createElement('span');
+        petal.className = 'falling-petal';
+
+        const left = Math.random() * 100;
+        const duration = 5 + Math.random() * 5;
+        const delay = Math.random() * 4;
+        const size = 9 + Math.random() * 15;
+        const drift = `${-100 + Math.random() * 200}px`;
+        const spin = `${360 + Math.random() * 900}deg`;
+        const hue = Math.random();
+
+        petal.style.left = `${left}vw`;
+        petal.style.width = `${size}px`;
+        petal.style.height = `${size * 1.45}px`;
+        petal.style.animationDuration = `${duration}s`;
+        petal.style.animationDelay = `${delay}s`;
+        petal.style.setProperty('--drift', drift);
+        petal.style.setProperty('--spin', spin);
+        petal.style.background = hue > .45
+          ? 'linear-gradient(145deg, #f5a1b1, #c43c61)'
+          : 'linear-gradient(145deg, #ffd75d, #e6a31c)';
+
+        petalRain.appendChild(petal);
+      }
+    }
+
+    function openLetter() {
+      if (opened) return;
+      opened = true;
+      openButton.classList.add('is-opening');
+
+      setTimeout(() => {
+        intro.classList.add('opened');
+        document.body.classList.add('revealed');
+        createPetals();
+      }, 850);
+    }
+
+    function replay() {
+      opened = false;
+      document.body.classList.remove('revealed');
+      intro.classList.remove('opened');
+      openButton.classList.remove('is-opening');
+      petalRain.innerHTML = '';
+    }
+
+    openButton.addEventListener('click', openLetter);
+    replayButton.addEventListener('click', replay);
+  </script>
+</body>
+</html>
